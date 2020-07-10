@@ -1,0 +1,76 @@
+# Official docker image.
+image: husol/hus-docker-ci
+
+variables:
+    WORK_DIR: '/builds/husol/$APP_NAME'
+    DEST_SRC: '/projects/go/$APP_NAME'
+
+stages:
+    - build
+    - deploy
+
+.build:
+    stage: build
+    script:
+        ## Create hus_build directory for artifacts
+        - mkdir hus_build
+        - go build -ldflags "-s -w" -o ./hus_build/$APP_NAME ./cmd/main.go
+
+    artifacts:
+        paths:
+            - hus_build
+        expire_in: 30 days
+
+build_staging:
+    extends: .build
+    variables:
+        SERVER_HOST: $BETA_SERVER_DOMAIN
+    only:
+        - develop
+
+build_prod:
+    extends: .build
+    variables:
+        SERVER_HOST: $PROD_SERVER_DOMAIN
+    only:
+        - master
+
+.deploy:
+    stage: deploy
+    script:
+        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+        - eval $(ssh-agent -s)
+        - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+        - ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+
+        ## Add the SSH key stored in DEPLOYER_PRIVATE_KEY variable to the agent store
+        ## We're using tr to fix line endings which makes ed25519 keys work
+        ## without extra base64 encoding.
+        ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+        ##
+        - echo "$DEPLOYER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        ##
+        ## Create the SSH directory and give it the right permissions
+        ##
+        - chmod 700 ~/.ssh
+        - rsync -vauz -e "ssh -p 22" --exclude 'public/images' --delete hus_build/ root@$SERVER_HOST:/tmp/hus_deploy
+        - ssh -tt root@$SERVER_HOST "killall $APP_NAME || echo \"Process was not running.\""
+        - ssh -tt root@$SERVER_HOST "bash $DEPLOY_SCRIPT \"$APP_NAME\""
+
+hus_staging:
+    extends: .deploy
+    variables:
+        SERVER_HOST: $BETA_SERVER_DOMAIN
+        SERVER_IP: $BETA_SERVER_IP
+    only:
+        - develop
+
+hus_prod:
+    extends: .deploy
+    variables:
+        SERVER_HOST: $PROD_SERVER_DOMAIN
+        SERVER_IP: $PROD_SERVER_IP
+    only:
+        - master
+    when: manual

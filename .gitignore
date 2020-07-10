@@ -1,0 +1,15 @@
+#common
+.env
+
+#log and temp
+/bin/
+/tmp/
+/coverage/
+
+#IntelliJ
+.idea/
+/*.iml
+
+#file system on mac
+.DS_Store
+
