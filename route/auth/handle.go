@@ -8,6 +8,7 @@ import (
 	mod "github.com/husol/middleware/model"
 	"github.com/husol/middleware/token"
 	"github.com/jinzhu/copier"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"time"
 )
