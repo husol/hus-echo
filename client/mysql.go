@@ -8,6 +8,8 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
+
+	//Register using gorm mysql
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 

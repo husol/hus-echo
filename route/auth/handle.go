@@ -5,10 +5,9 @@ import (
 	"crm-service/model"
 	"crm-service/util"
 	"github.com/husol/libs"
+	mod "github.com/husol/middleware/model"
+	"github.com/husol/middleware/token"
 	"github.com/jinzhu/copier"
-	mod "github.com/khangjig/middleware-pkg/model"
-	"github.com/khangjig/middleware-pkg/token"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"time"
 )
