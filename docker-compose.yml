@@ -1,13 +1,13 @@
 version: '3'
 services:
-#  VtigerUser:
+#  DemoService:
 #    build:
 #      context: .
 #      args:
 #        - PROJECT_DIR=$PWD
-#    image: golang-VtigerUser
-#    container_name: golang-VtigerUser
-#    command: scripts/wait-for-it.sh VtigerUser-db:3306 --timeout=0 --strict -- ./server
+#    image: golang-demo
+#    container_name: golang-demo
+#    command: scripts/wait-for-it.sh demo-db:3306 --timeout=0 --strict -- ./server
 #    volumes:
 #      - .:$PWD
 #    ports:
@@ -34,7 +34,7 @@ services:
     ports:
       - 3313:3306
     volumes:
-      - VtigerUser-db:/var/lib/mysql
+      - demo-db:/var/lib/mysql
     command:
       [
         "mysqld",

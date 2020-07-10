@@ -1,6 +1,6 @@
 package model
 
-type VtigerUser struct {
+type User struct {
 	ID        int64  `json:"id" gorm:"column:id"`
 	Email     string `json:"email" gorm:"column:email1"`
 	Username  string `json:"username" gorm:"column:user_name"`

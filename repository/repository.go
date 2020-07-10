@@ -7,7 +7,7 @@ import (
 )
 
 type Repository struct {
-	UserRepo user.IVtigerUser
+	UserRepo user.IUser
 }
 
 func New(getClient func(ctx context.Context) *gorm.DB) *Repository {
